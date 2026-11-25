@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Device Scanner</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            background: #101827;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            margin-bottom: 35px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 7px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            font-size: 16px;
+            margin: 12px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .result {
+            display: none;
+            line-height: 2;
+        }
+
+        .error {
+            color: #f87171;
+        }
+
+        .value {
+            color: #38bdf8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>IP Device Scanner</h1>
+
+    <p class="subtitle">
+        Discover information about devices on your network
+    </p>
+
+    <div class="card">
+
+        <h3>Scan a Device</h3>
+
+        <input
+            type="text"
+            id="ipAddress"
+            placeholder="Enter IP e.g. 192.168.1.105"
+        >
+
+        <button id="scanButton" onclick="scanDevice()">
+            Scan Device
+        </button>
+
+    </div>
+
+    <div class="card result" id="result">
+
+        <h3>Device Information</h3>
+
+        <p>IP Address: <span class="value" id="ip"></span></p>
+
+        <p>Status: <span class="value" id="status"></span></p>
+
+        <p>Hostname: <span class="value" id="hostname"></span></p>
+
+        <p>Open Ports: <span class="value" id="ports"></span></p>
+
+    </div>
+
+    <p class="error" id="error"></p>
+
+</div>
+
+<script>
+
+async function scanDevice() {
+
+    const ip = document.getElementById("ipAddress").value.trim();
+    const button = document.getElementById("scanButton");
+    const result = document.getElementById("result");
+    const error = document.getElementById("error");
+
+    result.style.display = "none";
+    error.textContent = "";
+
+    if (!ip) {
+        error.textContent = "Please enter an IP address.";
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Scanning...";
+
+    try {
+
+        const response = await fetch("/api/scan", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ ip: ip })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Scan failed");
+        }
+
+        document.getElementById("ip").textContent = data.ip;
+        document.getElementById("status").textContent = data.status;
+        document.getElementById("hostname").textContent = data.hostname;
+
+        document.getElementById("ports").textContent =
+            data.open_ports.length
+                ? data.open_ports.join(", ")
+                : "No detected open ports";
+
+        result.style.display = "block";
+
+    } catch (err) {
+
+        error.textContent = err.message;
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Scan Device";
+
+    }
+}
+
+</script>
+
+</body>
+</html>

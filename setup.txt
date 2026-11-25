@@ -1,0 +1,79 @@
+============================================================
+IP Device Scanner - Setup Instructions
+============================================================
+
+REQUIREMENTS
+------------
+- Windows 10 or later (or any OS with Python 3.10+)
+- Python 3.10 or newer installed and on PATH
+    Download: https://www.python.org
+    IMPORTANT: During install, check "Add Python to PATH"
+
+INSTALLATION
+------------
+1. Open a terminal/command prompt in this project folder.
+
+2. Create a virtual environment (recommended):
+
+       python -m venv venv
+
+3. Activate the virtual environment:
+
+       venv\Scripts\activate        (Windows Command Prompt)
+       venv\Scripts\activate.bat    (batch file)
+       venv\Scripts\Activate.ps1    (PowerShell)
+       source venv/bin/activate     (Linux/Mac)
+
+4. Install the required packages:
+
+       pip install -r requirements.txt
+
+   This installs:
+       - fastapi
+       - uvicorn
+
+
+RUNNING THE APP
+---------------
+1. Make sure the virtual environment is activated
+   (see step 3 above). You should see (venv) in your prompt.
+
+2. Start the server:
+
+       uvicorn main:app --host 127.0.0.1 --port 8000
+
+   Or without activating the venv:
+
+       venv\Scripts\python -m uvicorn main:app --host 127.0.0.1 --port 8000
+
+3. Open your browser and go to:
+
+       http://127.0.0.1:8000
+
+4. To stop the server, press Ctrl+C in the terminal.
+
+
+TROUBLESHOOTING
+---------------
+- "python is not recognized":
+    Python is not installed or not on PATH.
+    Reinstall Python and tick "Add Python to PATH".
+
+- "pip is not recognized":
+    Run: python -m pip install --upgrade pip
+
+- Port 8000 already in use:
+    Use a different port:
+        uvicorn main:app --host 127.0.0.1 --port 8080
+    Then open http://127.0.0.1:8080
+
+- ModuleNotFoundError: No module named 'fastapi':
+    Activate the venv and run: pip install -r requirements.txt
+
+
+PROJECT FILES
+-------------
+main.py              - FastAPI application (scan API + ping/port checks)
+static\index.html    - Web interface
+requirements.txt     - Python dependencies
+setup.txt            - This file
